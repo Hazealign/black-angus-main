@@ -23,7 +23,10 @@ class BotCore:
         self.bot.run(self.config.discord.token)
 
     async def on_message(self, context: discord.Message):
-        pass
+        self.logger.info(
+            f'[{context.guild.name}#{context.channel.name}] '
+            f'{context.author.name}: {context.clean_content}'
+        )
 
     async def on_ready(self):
         self.logger.info('봇이 준비되었습니다.')
