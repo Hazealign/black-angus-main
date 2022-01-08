@@ -4,11 +4,11 @@ from typing import Any, Dict, Optional, Tuple
 import discord
 from discord import Client, Embed
 
-from blackangus.apps.base import BaseResponseApp
+from blackangus.apps.base import PresentedResponseApp
 from blackangus.config import Config
 
 
-class RandomResponseApp(BaseResponseApp):
+class RandomApp(PresentedResponseApp):
     disabled = False
     commands = ['랜덤', 'random']
 

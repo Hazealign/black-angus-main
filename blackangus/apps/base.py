@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 import discord
-from discord import Embed, Client
+from discord import Client, Embed
 
 from blackangus.config import Config
 
@@ -12,21 +12,41 @@ class AppException(Exception):
 
 
 class BaseResponseApp(metaclass=ABCMeta):
-    # 비활성화 플래그
-    disabled: bool = False
-    prefix: Optional[str] = None
-    # 커맨드
-    commands: List[str] = []
+    disabled = False
 
     config: Config
     client: Client
+
+    @abstractmethod
+    async def action(self, context: discord.Message):
+        pass
+
+
+class BasePeriodicApp(metaclass=ABCMeta):
+    period: str
+    disabled = False
+
+    config: Config
+    client: Client
+
+    @abstractmethod
+    async def action(self):
+        pass
+
+
+class PresentedResponseApp(BaseResponseApp, metaclass=ABCMeta):
+    prefix: Optional[str] = None
+    # 커맨드
+    commands: List[str] = []
 
     @abstractmethod
     async def parse_command(self, context: discord.Message) -> Optional[Dict[str, Any]]:
         pass
 
     @abstractmethod
-    async def present(self, command: Dict[str, Any]) -> Tuple[Optional[str], Optional[Embed]]:
+    async def present(
+        self, command: Dict[str, Any]
+    ) -> Tuple[Optional[str], Optional[Embed]]:
         pass
 
     async def action(self, context: discord.Message):
@@ -36,10 +56,12 @@ class BaseResponseApp(metaclass=ABCMeta):
 
         # 키워드랑 prefix로 조합하기
         prefix: str = self.prefix or self.config.bot.prefix
-        if not any(map(
+        if not any(
+            map(
                 lambda x: context.clean_content.startswith(f'{prefix}{x}'),
-                self.commands
-        )):
+                self.commands,
+            )
+        ):
             return
 
         # parse, presenter, send
