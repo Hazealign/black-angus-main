@@ -1,9 +1,13 @@
+import asyncio
 import logging
 from pathlib import Path
+from typing import List
 
 import discord
 from discord.ext import commands
 
+from blackangus.apps.base import BaseResponseApp
+from blackangus.apps.miscs.random import RandomResponseApp
 from blackangus.config import Config, load
 
 
@@ -17,6 +21,16 @@ class BotCore:
         self.config: Config = load(Path(config))
         self.bot = commands.Bot(command_prefix=self.config.bot.prefix)
 
+        self.response_apps: List[BaseResponseApp] = list(
+            map(
+                lambda x: x(self.config, self.bot),
+                [
+                    # 여기에 개발한 커맨드(앱)들을 넣어주세요.
+                    RandomResponseApp
+                ],
+            )
+        )
+
     def run(self):
         self.bot.event(self.on_message)
         self.bot.event(self.on_ready)
@@ -24,9 +38,11 @@ class BotCore:
 
     async def on_message(self, context: discord.Message):
         self.logger.info(
-            f'[{context.guild.name}#{context.channel.name}] '
-            f'{context.author.name}: {context.clean_content}'
+            f'[{context.guild.name} - {context.channel.name}] '
+            f'{context.author.nick}: {context.clean_content}'
         )
+
+        await asyncio.gather(*map(lambda x: x.action(context), self.response_apps))
 
     async def on_ready(self):
         self.logger.info('봇이 준비되었습니다.')
