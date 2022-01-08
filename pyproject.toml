@@ -1,0 +1,46 @@
+[tool.black]
+line-length = 79
+skip_string_normalization = true
+
+[tool.poetry]
+name = "black-angus-main"
+version = "0.0.1"
+description = "All New Black Angus Bot, Multi-Purpose Discord Bot"
+authors = ["Haze Lee <hazelee@realignist.me>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+py-cord = {extras = ["speed"], version = "^1.7.3"}
+httpx = "^0.21.3"
+click = "^8.0.3"
+boto3 = "^1.20.31"
+pandas = "^1.3.5"
+SQLAlchemy = "^1.4.29"
+SQLAlchemy-Utils = "^0.38.2"
+aiocron = "^1.8"
+pendulum = "^2.1.2"
+fuzzywuzzy = {extras = ["speedup"], version = "^0.18.0"}
+toml = "^0.10.2"
+orjson = "^3.6.5"
+psycopg2 = "^2.9.3"
+psycopg2-binary = "^2.9.3"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.931"
+pytest = "^6.2.5"
+pytest-asyncio = "^0.16.0"
+pytest-cov = "^3.0.0"
+aioresponses = "^0.7.2"
+flake8 = "^4.0.1"
+flake8-import-order = "^0.18.1"
+pre-commit = "^2.16.0"
+zimports = "^0.4.1"
+black = "^21.12b0"
+time-machine = "^2.5.0"
+types-orjson = "^3.6.1"
+types-toml = "^0.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

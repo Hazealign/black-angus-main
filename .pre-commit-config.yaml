@@ -1,0 +1,58 @@
+fail_fast: true
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+    - id: check-ast
+    - id: check-byte-order-marker
+    - id: check-case-conflict
+    - id: check-json
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: check-toml
+    - id: check-xml
+    - id: check-yaml
+    - id: debug-statements
+    - id: detect-private-key
+    - id: double-quote-string-fixer
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.2.2
+    hooks:
+    - id: yesqa
+  - repo: local
+    hooks:
+      - id: zimports
+        name: zimports
+        exclude: |
+          (?x)^(
+            .*/templates/.*
+          )$
+        entry: zimports
+        args: ['--expand-stars', '--keep-unused']
+        language: system
+        types: [ python ]
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [ python ]
+      - id: flake8
+        name: flake8
+        exclude: |
+          (?x)^(
+            .*/templates/.*
+          )$
+        entry: flake8
+        language: system
+        types: [ python ]
+      - id: mypy
+        name: mypy
+        exclude: |
+          (?x)^(
+            .*/templates/.*
+          )$
+        entry: mypy
+        language: system
+        types: [ python ]
