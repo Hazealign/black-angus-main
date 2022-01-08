@@ -1,3 +1,5 @@
+import logging
+
 import click
 
 from blackangus.core import BotCore
@@ -13,11 +15,14 @@ def blackangus():
 
 @blackangus.command('run')
 @click.argument('config', default='./config.toml')
-def run(config: str):
+@click.option('--log-level', default='INFO')
+def run(config: str, log_level: str):
     """
     봇을 실행합니다.
     :param config: 설정 파일
+    :param log_level: 로그 레벨
     """
+    logging.basicConfig(level=log_level)
     return BotCore(config).run()
 
 

@@ -16,6 +16,8 @@ class DiscordConfig(BaseModel):
 class BotConfig(BaseModel):
     app_list: List[str] = Field(default_factory=list)
     prefix: str = Field(default='!')
+    log_when_ready: bool = Field(default=False)
+    log_channel: str
 
 
 class Config(BaseModel):
