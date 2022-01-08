@@ -1,9 +1,9 @@
 [tool.black]
-line-length = 79
+line-length = 88
 skip_string_normalization = true
 
 [tool.poetry]
-name = "black-angus-main"
+name = "blackangus"
 version = "0.0.1"
 description = "All New Black Angus Bot, Multi-Purpose Discord Bot"
 authors = ["Haze Lee <hazelee@realignist.me>"]
@@ -33,12 +33,15 @@ aioresponses = "^0.7.2"
 flake8 = "^4.0.1"
 flake8-import-order = "^0.18.1"
 pre-commit = "^2.16.0"
-zimports = "^0.4.1"
 black = "^21.12b0"
 time-machine = "^2.5.0"
 types-orjson = "^3.6.1"
 types-toml = "^0.10.1"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+bot = "blackangus.main:blackangus"
