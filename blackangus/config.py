@@ -25,10 +25,20 @@ class PapagoConfig(BaseModel):
     client_secret: str
 
 
+class GoogleConfig(BaseModel):
+    api_key: str
+
+
+class WeatherConfig(BaseModel):
+    api_key: str
+
+
 class Config(BaseModel):
     discord: DiscordConfig
     bot: BotConfig
     papago: PapagoConfig
+    google: GoogleConfig
+    weather: WeatherConfig
 
 
 def panic(message: str, *args):
