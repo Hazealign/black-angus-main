@@ -44,9 +44,3 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-
-      - id: isort
-        name: "Sort imports"
-        language: system
-        types: [file, python]
-        entry: isort

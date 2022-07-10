@@ -20,9 +20,15 @@ class BotConfig(BaseModel):
     log_channel: str
 
 
+class PapagoConfig(BaseModel):
+    client_id: str
+    client_secret: str
+
+
 class Config(BaseModel):
     discord: DiscordConfig
     bot: BotConfig
+    papago: PapagoConfig
 
 
 def panic(message: str, *args):

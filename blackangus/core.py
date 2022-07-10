@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.miscs.random import RandomApp
+from blackangus.apps.miscs.translation import TranslationApp
 from blackangus.config import Config, load
 
 
@@ -25,6 +26,7 @@ class BotCore:
         self.response_apps: List[BaseResponseApp] = [
             # 여기에 개발한 응답형 커맨드(앱)들을 넣어주세요.
             RandomApp(self.config, self.bot),
+            TranslationApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
