@@ -46,6 +46,19 @@ class WeatherModel:
     description: str
 
 
+@dataclasses.dataclass
+class AirPollutionModel:
+    aqi: int
+    co: Optional[float] = None
+    no: Optional[float] = None
+    no2: Optional[float] = None
+    o3: Optional[float] = None
+    so2: Optional[float] = None
+    pm2_5: Optional[float] = None
+    pm10: Optional[float] = None
+    nh3: Optional[float] = None
+
+
 async def get_weather_from_openweather(
     config: WeatherConfig, location: Tuple[float, float]
 ) -> WeatherModel:
@@ -93,11 +106,56 @@ async def get_weather_from_openweather(
             wind_degree=response_data['wind']['deg'],
             cloudiness=response_data['clouds']['all'],
             rain=rain,
-            rain_1h=response_data['rain']['1h'] if rain else None,
-            rain_3h=response_data['rain']['3h'] if rain else None,
+            rain_1h=response_data['rain'].get('1h', None) if rain else None,
+            rain_3h=response_data['rain'].get('3h', None) if rain else None,
             snow=snow,
-            snow_1h=response_data['snow']['1h'] if snow else None,
-            snow_3h=response_data['snow']['3h'] if snow else None,
+            snow_1h=response_data['snow'].get('1h', None) if snow else None,
+            snow_3h=response_data['snow'].get('3h', None) if snow else None,
             status=response_data['weather'][0]['main'],
             description=response_data['weather'][0]['description'],
+        )
+
+
+async def get_air_pollution_from_openweather(
+    config: WeatherConfig, location: Tuple[float, float]
+) -> AirPollutionModel:
+    """
+    OpenWeather에서 공기 오염도를 가져옵니다.
+
+    :param config: API KEY가 담긴 객체
+    :param location: 위경도 튜플(첫번쨰가 latitude, 두번째가 longitude)
+    :return: 정규화된 객체
+    """
+    data = urllib.parse.urlencode(
+        {
+            'lat': location[0],
+            'lon': location[1],
+            'appid': config.api_key,
+        },
+        doseq=True,
+    )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            'https://api.openweathermap.org/data/2.5/air_pollution?' + data
+        )
+
+        if not response.is_success:
+            raise WeatherAPIException(f'{response.status_code}: API 요청에 실패했습니다.')
+
+        response_data = response.json()
+
+        if len(response_data.get('list', list())) == 0:
+            raise WeatherAPIException('요청한 위치의 공기오염도가 존재하지 않습니다.')
+
+        return AirPollutionModel(
+            aqi=response_data['list'][0]['main']['aqi'],
+            co=response_data['list'][0]['components'].get('co', None),
+            no=response_data['list'][0]['components'].get('no', None),
+            no2=response_data['list'][0]['components'].get('no2', None),
+            o3=response_data['list'][0]['components'].get('o3', None),
+            so2=response_data['list'][0]['components'].get('so2', None),
+            pm2_5=response_data['list'][0]['components'].get('pm2_5', None),
+            pm10=response_data['list'][0]['components'].get('pm10', None),
+            nh3=response_data['list'][0]['components'].get('nh3', None),
         )
