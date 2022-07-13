@@ -13,6 +13,7 @@ from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
 from blackangus.apps.miscs.weather import WeatherApp
+from blackangus.apps.subscription.periodic import RSSSubscriberApp
 from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
 from blackangus.models.subscribe import RSSDocumentModel, RSSSubscriptionModel
@@ -38,6 +39,7 @@ class BotCore:
 
         self.periodic_apps: List[BasePeriodicApp] = [
             # 여기에 개발한 주기적 커맨드(앱)들을 넣어주세요.
+            RSSSubscriberApp(self.config, self.bot),
         ]
 
     def run(self):

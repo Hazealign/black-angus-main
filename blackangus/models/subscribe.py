@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import uuid4, UUID
 
 from beanie import Document
@@ -26,6 +27,9 @@ class RSSSubscriptionModel(Document):
 
     # 구독할 RSS 피드
     link: str
+
+    # 마지막 '업로드' 시간
+    latest_published_at: Optional[datetime] = Field(default=None)
 
 
 class RSSDocumentModel(Document):

@@ -64,7 +64,6 @@ class RSSRegisterApp(PresentedResponseApp):
             link=command['link'],
             channel=command['channel'],
             guild_id=command['guild_id'],
-            documents=list(),
         )
 
         try:
@@ -85,6 +84,14 @@ class RSSRegisterApp(PresentedResponseApp):
 
                 await document.insert()
 
+                if (
+                    not subscription.latest_published_at
+                    or subscription.latest_published_at.timestamp()
+                    < document.published_at.timestamp()
+                ):
+                    subscription.latest_published_at = document.published_at
+
+            await subscription.replace()
             return None, self.success_embed(command['name'], command['channel'])
         except BaseException as e:
             return None, Embed(
