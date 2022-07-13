@@ -45,6 +45,9 @@ class BotCore:
         self.bot.run(self.config.discord.token)
 
     async def on_message(self, context: discord.Message):
+        if context.author.bot:
+            return
+
         user_name = (
             context.author.name if context.author.nick is None else context.author.nick
         )
