@@ -7,11 +7,11 @@ from discord import Color, Client, Embed
 
 from blackangus.apps.base import PresentedResponseApp
 from blackangus.config import Config
-from blackangus.utils.google_geocoding_client import (
+from blackangus.utils.network.google_geocoding_client import (
     GoogleAPIException,
     geocode_from_google,
 )
-from blackangus.utils.weather_client import (
+from blackangus.utils.network.weather_client import (
     WeatherAPIException,
     get_weather_from_openweather,
     WeatherModel,

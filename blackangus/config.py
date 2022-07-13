@@ -33,9 +33,15 @@ class WeatherConfig(BaseModel):
     api_key: str
 
 
+class DatabaseConfig(BaseModel):
+    url: str
+    database_name: str
+
+
 class Config(BaseModel):
     discord: DiscordConfig
     bot: BotConfig
+    mongodb: DatabaseConfig
     papago: PapagoConfig
     google: GoogleConfig
     weather: WeatherConfig

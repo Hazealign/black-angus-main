@@ -5,13 +5,17 @@ from typing import List
 
 import discord
 from aiocron import crontab
+from beanie import init_beanie
 from discord.ext import commands
+import motor.motor_asyncio
 
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
 from blackangus.apps.miscs.weather import WeatherApp
+from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
+from blackangus.models.subscribe import RSSDocumentModel, RSSSubscriptionModel
 
 
 class BotCore:
@@ -29,6 +33,7 @@ class BotCore:
             RandomApp(self.config, self.bot),
             TranslationApp(self.config, self.bot),
             WeatherApp(self.config, self.bot),
+            RSSRegisterApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
@@ -60,6 +65,19 @@ class BotCore:
         await asyncio.gather(*map(lambda x: x.action(context), self.response_apps))
 
     async def on_ready(self):
+        # 봇이 준비되자마자 데이터베이스 연결을 한다.
+        # run을 async로 만드는 것보다 이게 나음.
+        client = motor.motor_asyncio.AsyncIOMotorClient(self.config.mongodb.url)
+
+        await init_beanie(
+            database=client[self.config.mongodb.database_name],
+            document_models=[
+                # 여기에 관련된 MongoDB 모델들을 넣어주세요.
+                RSSDocumentModel,
+                RSSSubscriptionModel,
+            ],
+        )
+
         self.logger.info('봇이 준비되었습니다.')
 
         if not self.config.bot.log_when_ready:

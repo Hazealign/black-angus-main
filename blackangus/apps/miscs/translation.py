@@ -5,7 +5,10 @@ from discord import Client, Color, Embed
 
 from blackangus.apps.base import PresentedResponseApp
 from blackangus.config import Config
-from blackangus.utils.papago_client import PapagoException, translate_from_papago
+from blackangus.utils.network.papago_client import (
+    PapagoException,
+    translate_from_papago,
+)
 
 
 class TranslationApp(PresentedResponseApp):
@@ -23,7 +26,7 @@ class TranslationApp(PresentedResponseApp):
     async def parse_command(self, context: discord.Message) -> Optional[Dict[str, Any]]:
         parsed = context.clean_content.split(' ')
 
-        if '--help' in parsed:
+        if '--help' in parsed or '-h' in parsed:
             return {'help': True}
 
         return {
