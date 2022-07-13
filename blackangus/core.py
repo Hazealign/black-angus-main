@@ -45,9 +45,13 @@ class BotCore:
         self.bot.run(self.config.discord.token)
 
     async def on_message(self, context: discord.Message):
+        user_name = (
+            context.author.name if context.author.nick is None else context.author.nick
+        )
+
         self.logger.info(
             f'[{context.guild.name} - {context.channel.name}] '
-            f'{context.author.nick}: {context.clean_content}'
+            f'{user_name}: {context.clean_content}'
         )
 
         await asyncio.gather(*map(lambda x: x.action(context), self.response_apps))
