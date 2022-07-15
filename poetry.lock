@@ -276,6 +276,17 @@ python-levenshtein = {version = ">=0.12", optional = true, markers = "extra == \
 speedup = ["python-levenshtein (>=0.12)"]
 
 [[package]]
+name = "greenlet"
+version = "1.1.2"
+description = "Lightweight in-process concurrent programming"
+category = "main"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
+
+[package.extras]
+docs = ["sphinx"]
+
+[[package]]
 name = "h11"
 version = "0.12.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -521,6 +532,28 @@ docs = ["furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-autodoc-typehint
 test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytest (>=6)"]
 
 [[package]]
+name = "playwright"
+version = "1.23.1"
+description = "A high-level API to automate web browsers"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+greenlet = "1.1.2"
+pyee = "8.1.0"
+typing-extensions = {version = "*", markers = "python_version <= \"3.8\""}
+websockets = "10.1"
+
+[[package]]
+name = "playwright-stealth"
+version = "1.0.5"
+description = "playwright stealth"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
@@ -593,6 +626,14 @@ typing-extensions = ">=3.7.4.3"
 [package.extras]
 dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
+
+[[package]]
+name = "pyee"
+version = "8.1.0"
+description = "A port of node.js's EventEmitter to python."
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "pyflakes"
@@ -868,6 +909,14 @@ docs = ["proselint (>=0.10.2)", "sphinx (>=3)", "sphinx-argparse (>=0.2.5)", "sp
 testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", "pytest (>=4)", "pytest-env (>=0.6.2)", "pytest-freezegun (>=0.4.1)", "pytest-mock (>=2)", "pytest-randomly (>=1)", "pytest-timeout (>=1)", "packaging (>=20.0)"]
 
 [[package]]
+name = "websockets"
+version = "10.1"
+description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "yarl"
 version = "1.7.2"
 description = "Yet another URL library"
@@ -882,7 +931,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "53e688be15bf7b6c0cd209187b208834f96214d6750f5a49f3fe437664721fe7"
+content-hash = "f579e1975fe687d0618c4635243afe4746c44284be535fac1608b839b7081164"
 
 [metadata.files]
 aiocron = []
@@ -908,6 +957,7 @@ filelock = []
 flake8 = []
 flake8-import-order = []
 fuzzywuzzy = []
+greenlet = []
 h11 = []
 html2text = []
 httpcore = []
@@ -929,12 +979,15 @@ pandas = []
 pathspec = []
 pendulum = []
 platformdirs = []
+playwright = []
+playwright-stealth = []
 pluggy = []
 pre-commit = []
 py = []
 py-cord = []
 pycodestyle = []
 pydantic = []
+pyee = []
 pyflakes = []
 pymongo = []
 pyparsing = []
@@ -960,4 +1013,5 @@ typing-extensions = []
 tzdata = []
 tzlocal = []
 virtualenv = []
+websockets = []
 yarl = []

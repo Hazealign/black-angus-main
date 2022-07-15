@@ -26,6 +26,8 @@ pydantic = "^1.9.1"
 motor = "^3.0.0"
 feedparser = "^6.0.10"
 html2text = "^2020.1.16"
+playwright = "^1.23.1"
+playwright-stealth = "^1.0.5"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"

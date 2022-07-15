@@ -13,6 +13,7 @@ from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
 from blackangus.apps.miscs.weather import WeatherApp
+from blackangus.apps.search.youtube import YoutubeSearchApp
 from blackangus.apps.subscription.periodic import RSSSubscriberApp
 from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
@@ -35,6 +36,7 @@ class BotCore:
             TranslationApp(self.config, self.bot),
             WeatherApp(self.config, self.bot),
             RSSRegisterApp(self.config, self.bot),
+            YoutubeSearchApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [

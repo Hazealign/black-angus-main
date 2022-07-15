@@ -13,8 +13,7 @@ from blackangus.utils.rss_feed import fetch_rss_feed, struct_time_to_pendulum_da
 
 
 class RSSSubscriberApp(BasePeriodicApp):
-    # period = '*/5 * * * *'
-    period = '* * * * *'
+    period = '*/2 * * * *'
     disabled = False
 
     def __init__(self, config: Config, client: Client):
