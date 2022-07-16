@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Dict, Any, Tuple
 
 from discord import Client, Message, Embed, Color
@@ -32,6 +33,9 @@ class YoutubeSearchApp(PresentedResponseApp):
 
     @staticmethod
     def result_to_embed(model: YoutubeModel) -> Embed:
+        logging.info(
+            f'[YoutubeModel] {model.title} / {model.duration} / {model.uploader} / {model.link}'
+        )
         return (
             Embed(
                 title=f'{model.title}',

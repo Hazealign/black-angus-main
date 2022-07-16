@@ -1,4 +1,3 @@
-import logging
 import urllib.parse
 from typing import List, Optional
 
@@ -30,23 +29,22 @@ class YoutubeScrapper(BaseScrapper[YoutubeModel]):
         # Selector 기반 스크래퍼이기 때문에 웹이 개편되면 다시 따야함
 
         thumbnail_links = await page.evaluate(
-            f"""
-            () => Array.from(
-                document.querySelectorAll(
-                    'ytd-video-renderer > div > ytd-thumbnail > a > ' +
-                    'yt-img-shadow.style-scope.ytd-thumbnail.no-transition > img.style-scope.yt-img-shadow'
-                )
-            ).map(item => item.attributes.src?.nodeValue)
-        """
+            """
+                () => Array.from(
+                    document.querySelectorAll(
+                        'ytd-video-renderer > div > ytd-thumbnail > a > ' +
+                        'yt-img-shadow.style-scope.ytd-thumbnail.no-transition > img.style-scope.yt-img-shadow'
+                    )
+                ).map(item => item.attributes.src?.nodeValue)
+            """
         )
-        logging.info(thumbnail_links)
 
         # 그냥 innerText로 자바스크립트에서 가져오면 안되어서 이런 불편한 방법을 쓰기로 함.
         duration_elements = await page.query_selector_all(
             selector="""
-            ytd-video-renderer > div > ytd-thumbnail > a > div#overlays >
-            ytd-thumbnail-overlay-time-status-renderer > span#text
-        """
+                ytd-video-renderer > div > ytd-thumbnail > a > div#overlays >
+                ytd-thumbnail-overlay-time-status-renderer > span#text
+            """
         )
 
         durations: List[str] = []
@@ -54,50 +52,46 @@ class YoutubeScrapper(BaseScrapper[YoutubeModel]):
             durations.append((await element.inner_text()).strip())
 
         titles = await page.evaluate(
-            f"""
-            () => Array.from(
-                document.querySelectorAll(
-                    'ytd-video-renderer > div#dismissible > div > div#meta > div#title-wrapper > h3 > a'
-                )
-            ).map(item => item.attributes['title'].nodeValue)
-        """
+            """
+                () => Array.from(
+                    document.querySelectorAll(
+                        'ytd-video-renderer > div#dismissible > div > div#meta > div#title-wrapper > h3 > a'
+                    )
+                ).map(item => item.attributes['title'].nodeValue)
+            """
         )
-        logging.info(titles)
 
         descriptions = await page.evaluate(
-            f"""
-            () => Array.from(
-                document.querySelectorAll(
-                    'ytd-video-renderer > div#dismissible > div > ' +
-                    'div.style-scope.ytd-video-renderer > yt-formatted-string'
-                )
-            ).map(item => item.innerText)
-        """
+            """
+                () => Array.from(
+                    document.querySelectorAll(
+                        'ytd-video-renderer > div#dismissible > div > ' +
+                        'div.style-scope.ytd-video-renderer > yt-formatted-string'
+                    )
+                ).map(item => item.innerText)
+            """
         )
-        logging.info(descriptions)
 
         uploader_names = await page.evaluate(
-            f"""
-            () => Array.from(
-                document.querySelectorAll(
-                    'ytd-video-renderer > div#dismissible > div > div > ' +
-                    'ytd-channel-name#channel-name > div#container > div#text-container > yt-formatted-string'
-                )
-            ).map(item => item.innerText)
-        """
+            """
+                () => Array.from(
+                    document.querySelectorAll(
+                        'ytd-video-renderer > div#dismissible > div > div > ' +
+                        'ytd-channel-name#channel-name > div#container > div#text-container > yt-formatted-string'
+                    )
+                ).map(item => item.innerText)
+            """
         )
-        logging.info(uploader_names)
 
         links = await page.evaluate(
-            f"""
-            () => Array.from(
-                document.querySelectorAll(
-                    'ytd-video-renderer > div#dismissible > div > div#meta > div#title-wrapper > h3 > a'
-                )
-            ).map(item => 'https://youtube.com' + item.attributes['href'].value)
-        """
+            """
+                () => Array.from(
+                    document.querySelectorAll(
+                        'ytd-video-renderer > div#dismissible > div > div#meta > div#title-wrapper > h3 > a'
+                    )
+                ).map(item => 'https://youtube.com' + item.attributes['href'].value)
+            """
         )
-        logging.info(links)
 
         results: List[YoutubeModel] = []
 

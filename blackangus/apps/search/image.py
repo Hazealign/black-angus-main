@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Dict, Any, Tuple
 
 from discord import Client, Message, Embed, Color
@@ -23,15 +24,19 @@ class GoogleImageSearchApp(PresentedResponseApp):
     @staticmethod
     def help_embed() -> Embed:
         return Embed(
-            title='Youtube 검색',
-            description='흑우로 유튜브 영상을 검색할 수 있습니다. API 방식이 아닌 스크래핑 방식을 이용하며, '
+            title='Google Images 검색',
+            description='흑우로 구글 이미지를 검색할 수 있습니다. API 방식이 아닌 스크래핑 방식을 이용하며, '
             '비-로그인 상태 웹에서 보는 것과 동일한 결과를 얻을 수 있습니다.\n'
-            '사용법은 `!youtube --count=갯수 검색어`로 입력하면 되며, 10개 이하의 결과만 가져올 수 있습니다.',
+            '사용법은 `!image --count=갯수 검색어`로 입력하면 되며, 30개 이하의 결과만 가져올 수 있습니다.\n'
+            '사진이 너무 많으면 도배가 될 수 있으니 사용에 주의하세요. `--count` 옵션이 없으면 기본은 1개입니다.',
             color=Color.red(),
         )
 
     @staticmethod
     def result_to_embed(model: GoogleImagesModel) -> Embed:
+        logging.info(
+            f'[GoogleImagesModel] {model.title} / {model.destination_link} / {model.image_link}'
+        )
         return Embed(
             title=f'{model.title}',
             color=Color.green(),
@@ -41,8 +46,8 @@ class GoogleImageSearchApp(PresentedResponseApp):
     @staticmethod
     def error_embed(error: Exception) -> Embed:
         return Embed(
-            title='유튜브 검색 오류',
-            description='유튜브 검색 중 오류가 발생했습니다.\n' f'{error}',
+            title='구글 검색 오류',
+            description='구글 검색 중 오류가 발생했습니다.\n' f'{error}',
             color=Color.red(),
         )
 
