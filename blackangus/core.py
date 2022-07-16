@@ -9,6 +9,8 @@ from beanie import init_beanie
 from discord.ext import commands
 import motor.motor_asyncio
 
+from blackangus.apps.alarm.periodic import AlarmPeriodicApp
+from blackangus.apps.alarm.register import AlarmCommandApp
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.miscs.direction import NaverTransitDirectionApp
 from blackangus.apps.miscs.random import RandomApp
@@ -19,6 +21,7 @@ from blackangus.apps.search.youtube import YoutubeSearchApp
 from blackangus.apps.subscription.periodic import RSSSubscriberApp
 from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
+from blackangus.models.alarm import AlarmModel
 from blackangus.models.subscribe import RSSDocumentModel, RSSSubscriptionModel
 
 
@@ -41,11 +44,13 @@ class BotCore:
             YoutubeSearchApp(self.config, self.bot),
             GoogleImageSearchApp(self.config, self.bot),
             NaverTransitDirectionApp(self.config, self.bot),
+            AlarmCommandApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
             # 여기에 개발한 주기적 커맨드(앱)들을 넣어주세요.
             RSSSubscriberApp(self.config, self.bot),
+            AlarmPeriodicApp(self.config, self.bot),
         ]
 
     def run(self):
@@ -83,6 +88,7 @@ class BotCore:
                 # 여기에 관련된 MongoDB 모델들을 넣어주세요.
                 RSSDocumentModel,
                 RSSSubscriptionModel,
+                AlarmModel,
             ],
         )
 
