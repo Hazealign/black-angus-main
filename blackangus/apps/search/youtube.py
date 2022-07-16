@@ -25,13 +25,17 @@ class YoutubeSearchApp(PresentedResponseApp):
         if len(str.strip(' '.join(parsed))) == 0:
             return {'help': True}
 
-        if parsed[0].isnumeric():
-            return {
-                'help': False,
-                'count': int(parsed[0]),
-                'keyword': ' '.join(parsed[1:]),
-                'channel': context.channel.id,
-            }
+        # 처음 혹은 마지막에 count 옵션을 넣었을 때의 처리
+        for index in [0, len(parsed) - 1]:
+            item = parsed[index]
+
+            if item.startswith('--count='):
+                return {
+                    'help': False,
+                    'keyword': ' '.join(parsed[1:] if index == 0 else parsed[:index]),
+                    'count': int(item.split('=')[1]),
+                    'channel': context.channel.id,
+                }
 
         return {
             'help': False,
@@ -46,7 +50,7 @@ class YoutubeSearchApp(PresentedResponseApp):
             title='Youtube 검색',
             description='흑우로 유튜브 영상을 검색할 수 있습니다. API 방식이 아닌 스크래핑 방식을 이용하며, '
             '비-로그인 상태 웹에서 보는 것과 동일한 결과를 얻을 수 있습니다.\n'
-            '사용법은 `!youtube 갯수 검색어`로 입력하면 되며, 추천 동영상을 배제하기 위해 10개 이하의 결과만 가져올 수 있습니다.',
+            '사용법은 `!youtube --count=갯수 검색어`로 입력하면 되며, 10개 이하의 결과만 가져올 수 있습니다.',
             color=Color.red(),
         )
 
