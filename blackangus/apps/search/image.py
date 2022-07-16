@@ -5,13 +5,13 @@ from discord import Client, Message, Embed, Color
 from blackangus.apps.base import PresentedResponseApp
 from blackangus.apps.search.base import parse_search_command
 from blackangus.config import Config
-from blackangus.models.search import YoutubeModel
-from blackangus.scrapper.youtube import YoutubeScrapper
+from blackangus.models.search import GoogleImagesModel
+from blackangus.scrapper.google_images import GoogleImagesScrapper
 
 
-class YoutubeSearchApp(PresentedResponseApp):
+class GoogleImageSearchApp(PresentedResponseApp):
     disabled = False
-    commands = ['youtube', '유튜브']
+    commands = ['image', '짤']
 
     def __init__(self, config: Config, client: Client):
         self.config = config
@@ -31,18 +31,12 @@ class YoutubeSearchApp(PresentedResponseApp):
         )
 
     @staticmethod
-    def result_to_embed(model: YoutubeModel) -> Embed:
-        return (
-            Embed(
-                title=f'{model.title}',
-                description=f'{model.description}',
-                color=Color.green(),
-                url=model.link,
-            )
-            .set_image(url=model.thumbnail_link)
-            .add_field(name='재생 시간', value=model.duration, inline=True)
-            .add_field(name='업로더', value=model.uploader, inline=True)
-        )
+    def result_to_embed(model: GoogleImagesModel) -> Embed:
+        return Embed(
+            title=f'{model.title}',
+            color=Color.green(),
+            url=model.destination_link,
+        ).set_image(url=model.image_link)
 
     @staticmethod
     def error_embed(error: Exception) -> Embed:
@@ -59,7 +53,7 @@ class YoutubeSearchApp(PresentedResponseApp):
             return None, self.help_embed()
 
         keyword = command['keyword']
-        scrapper = YoutubeScrapper()
+        scrapper = GoogleImagesScrapper()
 
         try:
             await scrapper.initialize()
@@ -72,7 +66,7 @@ class YoutubeSearchApp(PresentedResponseApp):
             embeds = map(lambda result: self.result_to_embed(result), results)
             channel = self.client.get_channel(command['channel'])
 
-            await channel.send(content='유튜브 검색 결과입니다.')
+            await channel.send(content='구글 이미지 검색 결과입니다.')
             for embed in embeds:
                 await channel.send(embed=embed)
         except Exception as e:
