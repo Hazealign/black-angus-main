@@ -91,6 +91,7 @@ class NaverTransitDirectionApp(PresentedResponseApp):
         return embed
 
     async def parse_command(self, context: Message) -> Optional[Dict[str, Any]]:
+        # noinspection PyTypeChecker
         parsed = shlex.split(context.clean_content)[1:]
 
         if '-h' in parsed or '--help' in parsed:
