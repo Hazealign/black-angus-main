@@ -10,6 +10,7 @@ from discord.ext import commands
 import motor.motor_asyncio
 
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
+from blackangus.apps.miscs.direction import NaverTransitDirectionApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
 from blackangus.apps.miscs.weather import WeatherApp
@@ -39,6 +40,7 @@ class BotCore:
             RSSRegisterApp(self.config, self.bot),
             YoutubeSearchApp(self.config, self.bot),
             GoogleImageSearchApp(self.config, self.bot),
+            NaverTransitDirectionApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
