@@ -77,17 +77,23 @@ class EmoticonCommandApp(PresentedResponseApp):
             }
 
         if ['수정', 'edit', 'update'].__contains__(parsed[0]):
-            if len(parsed) < 3:
+            if len(parsed) < 4:
                 return {'error': True}
 
-            first_equivalents = len(parsed) == 4 and get_equivalents(parsed[1])
-            last_equivalents = len(parsed) == 4 and get_equivalents(parsed[3])
+            first_equivalents = len(parsed) == 5 and get_equivalents(parsed[1])
+            last_equivalents = len(parsed) == 5 and get_equivalents(parsed[3])
+
+            change_elem = parsed[2] if first_equivalents else parsed[1]
+            change = (
+                'link' if change_elem in ['url', 'link', 'URL', '주소', '링크'] else 'name'
+            )
 
             return {
                 'help': False,
                 'action': 'update',
-                'name': parsed[2] if first_equivalents else parsed[1],
-                'url': parsed[3] if first_equivalents else parsed[2],
+                'change': change,
+                'name': parsed[3] if first_equivalents else parsed[2],
+                'target': parsed[4] if first_equivalents else parsed[3],
                 'equivalents': first_equivalents or last_equivalents,
             }
 
@@ -143,10 +149,11 @@ class EmoticonCommandApp(PresentedResponseApp):
             )
             .add_field(
                 name='이모티콘 수정하기(수정, edit)',
-                value='이모티콘의 이미지를 수정할 수 있습니다. 이름을 수정하는 것은 지원하지 않습니다.\n'
-                '**복제된 이모티콘은 반영되지 않는 것이 기본 동작입니다.**\n'
+                value='이모티콘의 이름 혹은 이미지를 교체할 수 있습니다.\n'
+                '**이미지를 변경하면 해당 이모티콘에서 복제된 이모티콘은 반영되지 않는 것이 기본 동작입니다.**\n'
                 '복제된 다른 이모티콘을 수정하지 않으려면 `-e`, `--equivalents` 옵션을 넣어주세요.\n'
-                '`!이모티콘 수정 [-e] 이름 URL`로 사용할 수 있습니다.',
+                '`!이모티콘 수정 [-e] 주소 이모티콘_이름 새_URL`로 주소를 바꾸거나, \n'
+                '`!이모티콘 수정 링크 이모티콘_이름 새_이름`으로 이름을 바꿀 수 있습니다.',
                 inline=False,
             )
             .add_field(
@@ -230,12 +237,17 @@ class EmoticonCommandApp(PresentedResponseApp):
 
             if action == 'update':
                 name = command['name']
-                url = command['url']
+                target = command['target']
+                change = command['change']
                 equivalents = command['equivalents']
 
-                updated_value = await self.emoticon_service.update(
-                    name, url, update_equivalents=equivalents
-                )
+                if change == 'link':
+                    updated_value = await self.emoticon_service.update(
+                        name, target, update_equivalents=equivalents
+                    )
+                else:
+                    updated_value = await self.emoticon_service.rename(name, target)
+
                 logging.info(f'Updated: {updated_value}')
 
                 if type(updated_value) == list:
