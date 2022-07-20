@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from enum import Enum
 from io import BytesIO
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -23,6 +23,7 @@ class ImageExtensionEnum(Enum):
     JPG = 1
     PNG = 2
     GIF = 3
+    WEBP = 4
     UNKNOWN = 0
 
 
@@ -30,14 +31,16 @@ class ImageExtensionEnum(Enum):
 def get_extension_of_url(url: str) -> ImageExtensionEnum:
     parsed = urlparse(url).path.split('.')[-1]
 
-    if parsed == 'jpg':
+    if parsed == 'jpg' or parsed == 'jpeg':
         return ImageExtensionEnum.JPG
     elif parsed == 'png':
         return ImageExtensionEnum.PNG
     elif parsed == 'gif':
         return ImageExtensionEnum.GIF
+    elif parsed == 'webp':
+        return ImageExtensionEnum.WEBP
     else:
-        return ImageExtensionEnum.UNKNOWN
+        return ImageExtensionEnum.JPG
 
 
 class EmoticonService:
@@ -85,7 +88,7 @@ class EmoticonService:
             raise EmoticonException(f'S3 저장에 실패했습니다: {e}')
 
     # 디스코드에서 쓰기 위해 파일을 다운로드 받습니다.
-    async def download(self, model: EmoticonModel) -> Tuple[str, BytesIO]:
+    def download(self, model: EmoticonModel) -> Tuple[str, BytesIO]:
         exists_result = self.s3.list_objects_v2(
             Bucket=self.s3_bucket,
             Prefix=model.path,
@@ -161,7 +164,7 @@ class EmoticonService:
         self,
         name: str,
         new_url: str,
-        update_equivalents: bool = True,
+        update_equivalents: bool = False,
     ) -> Union[EmoticonModel, List[EmoticonModel]]:
         previous_list = await EmoticonModel.find(
             {
@@ -212,7 +215,7 @@ class EmoticonService:
 
     # 이모티콘을 삭제합니다.
     @staticmethod
-    async def remove(name: str, remove_equivalents: bool = True):
+    async def remove(name: str, remove_equivalents: bool = False):
         prev = await EmoticonModel.find(
             {
                 'name': name,
@@ -244,9 +247,22 @@ class EmoticonService:
             )
 
     @staticmethod
+    async def find_by_name(name: str) -> Optional[EmoticonModel]:
+        return await EmoticonModel.find(
+            {
+                'name': name,
+                'removed': False,
+            }
+        ).first_or_none()
+
+    @staticmethod
     async def list_emoticons() -> List[str]:
         emoticons = await EmoticonModel.find(
-            {}, projection_model=EmoticonListView
+            {
+                'removed': False,
+            },
+            projection_model=EmoticonListView,
+            sort='name',
         ).to_list()
         return [emoticon.name for emoticon in emoticons]
 
