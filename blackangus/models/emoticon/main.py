@@ -1,9 +1,8 @@
 from uuid import UUID, uuid4
 from datetime import datetime
-from typing import List
 
 from beanie import Document, Indexed
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 
 # 기존 인공흑우 v1와 비슷하면서도 조금 더 간결해진 데이터 구조를 사용합니다.
@@ -12,7 +11,7 @@ class EmoticonModel(Document):
 
     name: str = Indexed(Field(required=True, min_length=1, max_length=10))
 
-    equivalents: List[str] = Field(default_factory=list)
+    original_url: str = Field(required=True)
 
     path: str = Field(equired=True)
 
@@ -21,3 +20,7 @@ class EmoticonModel(Document):
     created_at: datetime = Field(default_factory=datetime.now)
 
     updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class EmoticonListView(BaseModel):
+    name: str

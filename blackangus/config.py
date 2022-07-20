@@ -38,6 +38,14 @@ class DatabaseConfig(BaseModel):
     database_name: str
 
 
+class EmoticonConfig(BaseModel):
+    s3_bucket: str
+    s3_access_key: str
+    s3_secret_key: str
+    s3_region: str
+    api_endpoint: str
+
+
 class Config(BaseModel):
     discord: DiscordConfig
     bot: BotConfig
@@ -45,6 +53,7 @@ class Config(BaseModel):
     papago: PapagoConfig
     google: GoogleConfig
     weather: WeatherConfig
+    emoticon: EmoticonConfig
 
 
 def panic(message: str, *args):
