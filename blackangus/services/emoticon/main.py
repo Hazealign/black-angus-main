@@ -91,17 +91,17 @@ class EmoticonService:
     def download(self, model: EmoticonModel) -> Tuple[str, BytesIO]:
         exists_result = self.s3.list_objects_v2(
             Bucket=self.s3_bucket,
-            Prefix=model.path,
+            Prefix=model.image_path,
         )
 
         if 'Contents' not in exists_result:
             raise EmoticonException(f'{model.name}에 대한 이미지를 찾을 수 없습니다.')
 
-        file_name = model.path.split('/')[-1]
+        file_name = model.image_path.split('/')[-1]
         file = BytesIO(
             self.s3.get_object(
                 Bucket=self.s3_bucket,
-                Key=model.path,
+                Key=model.image_path,
             )['Body'].read()
         )
 
@@ -155,7 +155,7 @@ class EmoticonService:
         return await EmoticonModel(
             name=target,
             original_url=previous.original_url,
-            path=previous.path,
+            path=previous.image_path,
             removed=False,
         ).create()
 
@@ -202,6 +202,24 @@ class EmoticonService:
         )
 
         return previous_list[0] if len(previous_list) == 1 else previous_list
+
+    @staticmethod
+    async def rename(before: str, after: str) -> EmoticonModel:
+        previous = await EmoticonModel.find(
+            {
+                'name': before,
+                'removed': False,
+            }
+        ).first_or_none()
+
+        if previous is None:
+            raise EmoticonException(f'존재하지 않는 이모티콘입니다: {before}')
+
+        return await previous.set(
+            {
+                'name': after,
+            }
+        )
 
     # 특정 이름을 포함한 이모티콘을 검색합니다.
     @staticmethod
