@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
 from datetime import datetime
 
+import pymongo
 from beanie import Document, Indexed
 from pydantic import Field, BaseModel
 
@@ -9,7 +10,9 @@ from pydantic import Field, BaseModel
 class EmoticonModel(Document):
     id: UUID = Field(default_factory=uuid4)  # type: ignore
 
-    name: str = Indexed(Field(required=True, min_length=1, max_length=10))
+    name: Indexed(typ=str, index_type=pymongo.TEXT, unique=False) = Field(  # type: ignore
+        required=True, min_length=1, max_length=10
+    )
 
     original_url: str = Field(required=True)
 

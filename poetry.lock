@@ -1376,7 +1376,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "7af56c05b7e273de903fdd7e075e8f798022ba72bc6e9d615f3aa76def0ae180"
+content-hash = "fdc481ad54e0a0397b1b0aa21a7ddc4d6b7e35631ce200d747496c646d476c42"
 
 [metadata.files]
 aiocron = []

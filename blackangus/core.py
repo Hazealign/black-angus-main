@@ -12,6 +12,8 @@ import motor.motor_asyncio
 from blackangus.apps.alarm.periodic import AlarmPeriodicApp
 from blackangus.apps.alarm.register import AlarmCommandApp
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
+from blackangus.apps.emoticon.command import EmoticonCommandApp
+from blackangus.apps.emoticon.fetcher import EmoticonFetcherApp
 from blackangus.apps.miscs.direction import NaverTransitDirectionApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
@@ -22,6 +24,8 @@ from blackangus.apps.subscription.periodic import RSSSubscriberApp
 from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
 from blackangus.models.alarm import AlarmModel
+from blackangus.models.emoticon.linecon import LineconModel, LineconCategoryModel
+from blackangus.models.emoticon.main import EmoticonModel
 from blackangus.models.subscribe import RSSDocumentModel, RSSSubscriptionModel
 
 
@@ -45,6 +49,8 @@ class BotCore:
             GoogleImageSearchApp(self.config, self.bot),
             NaverTransitDirectionApp(self.config, self.bot),
             AlarmCommandApp(self.config, self.bot),
+            EmoticonFetcherApp(self.config, self.bot),
+            EmoticonCommandApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
@@ -89,6 +95,9 @@ class BotCore:
                 RSSDocumentModel,
                 RSSSubscriptionModel,
                 AlarmModel,
+                EmoticonModel,
+                LineconModel,
+                LineconCategoryModel,
             ],
         )
 
