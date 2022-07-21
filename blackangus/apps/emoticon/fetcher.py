@@ -5,6 +5,7 @@ from discord import Client, Embed, Color, File
 
 from blackangus.apps.base import BaseResponseApp
 from blackangus.config import Config
+from blackangus.services.emoticon import download_emoticon
 from blackangus.services.emoticon.main import EmoticonService
 
 
@@ -38,7 +39,12 @@ class EmoticonFetcherApp(BaseResponseApp):
             )
 
         # 파일을 보낸다.
-        (file_name, file) = self.emoticon_service.download(emoticon)
+        (file_name, file) = download_emoticon(
+            s3=self.emoticon_service.s3,
+            bucket=self.emoticon_service.s3_bucket,
+            model=emoticon,
+        )
+
         await context.channel.send(
             file=File(
                 file,

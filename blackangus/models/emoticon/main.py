@@ -27,9 +27,12 @@ class EmoticonModel(Document):
 
     image_path: str = Field(equired=True)
 
-    full_image_path: str = Field(required=False)
+    original_image_path: str = Field(required=False)
 
     image_from: EmoticonFrom = Field(default_factory=lambda: EmoticonFrom.WEB)
+
+    # Line용 필드
+    sound_url: str = Field(required=False, default=None)
 
     # LineconCategoryModel, DcconCategoryModel의 ID와 연결되는 기능
     relation_id: Optional[UUID] = Field(default=None)

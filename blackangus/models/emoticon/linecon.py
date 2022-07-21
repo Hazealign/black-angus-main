@@ -13,29 +13,13 @@ class SearchResultModel:
     link: str
 
 
-class LineconCategoryModel(Document):
+class LineconModel(Document):
     id: UUID = Field(default_factory=uuid4)  # type: ignore
 
-    originId: int = Field(required=True)
+    line_id: int = Field(required=True)
 
     name: str = Field(required=True, min_length=1, max_length=10)
 
     title: str = Field(required=True, min_length=1)
 
-    path: str = Field(required=True)
-
     created_at: datetime = Field(default_factory=datetime.now)
-
-
-class LineconModel(Document):
-    id: UUID = Field(default_factory=uuid4)  # type: ignore
-
-    categoryId: UUID = Field(required=True)
-
-    name: str = Field(required=True)
-
-    thumbnail_path: str = Field(required=True)
-
-    full_path: str = Field(required=True)
-
-    animated: bool = Field(default=False)

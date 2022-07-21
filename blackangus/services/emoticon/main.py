@@ -1,9 +1,6 @@
 import asyncio
 from datetime import datetime
-from enum import Enum
-from io import BytesIO
-from typing import List, Tuple, Union, Optional
-from urllib.parse import urlparse
+from typing import List, Union, Optional
 from uuid import uuid4
 
 import boto3
@@ -11,36 +8,8 @@ import httpx
 from mypy_boto3_s3 import S3Client
 
 from blackangus.config import EmoticonConfig
+from blackangus.services.emoticon import EmoticonException, transfer_file
 from blackangus.models.emoticon.main import EmoticonModel, EmoticonListView
-
-
-class EmoticonException(BaseException):
-    pass
-
-
-# 이 이미지의 확장자를 파악하기 위한 Enum.
-class ImageExtensionEnum(Enum):
-    JPG = 1
-    PNG = 2
-    GIF = 3
-    WEBP = 4
-    UNKNOWN = 0
-
-
-# 이 이미지의 확장자를 URL에서 파악합니다. 복잡한 이미지 컨텐츠 분석은 하지 않습니다.
-def get_extension_of_url(url: str) -> ImageExtensionEnum:
-    parsed = urlparse(url).path.split('.')[-1]
-
-    if parsed == 'jpg' or parsed == 'jpeg':
-        return ImageExtensionEnum.JPG
-    elif parsed == 'png':
-        return ImageExtensionEnum.PNG
-    elif parsed == 'gif':
-        return ImageExtensionEnum.GIF
-    elif parsed == 'webp':
-        return ImageExtensionEnum.WEBP
-    else:
-        return ImageExtensionEnum.JPG
 
 
 class EmoticonService:
@@ -60,53 +29,6 @@ class EmoticonService:
         self.s3_bucket = config.s3_bucket
         self.httpx_client = httpx.AsyncClient()
 
-    # 특정 URL의 파일을 다운로드하고, S3에 올립니다.
-    async def _transfer_file(self, url: str, s3_path: str) -> str:
-        response = await self.httpx_client.get(url)
-
-        for i in range(3):
-            if not response.is_success:
-                response = await self.httpx_client.get(url)
-            else:
-                break
-
-        if not response.is_success:
-            raise EmoticonException(f'이미지 다운로드에 실패했습니다: {response.status_code}')
-
-        data = response.content
-        key = f'{s3_path}.{get_extension_of_url(url)}'
-
-        try:
-            self.s3.put_object(
-                Bucket=self.s3_bucket,
-                Body=data,
-                Key=key,
-            )
-
-            return key
-        except Exception as e:
-            raise EmoticonException(f'S3 저장에 실패했습니다: {e}')
-
-    # 디스코드에서 쓰기 위해 파일을 다운로드 받습니다.
-    def download(self, model: EmoticonModel) -> Tuple[str, BytesIO]:
-        exists_result = self.s3.list_objects_v2(
-            Bucket=self.s3_bucket,
-            Prefix=model.image_path,
-        )
-
-        if 'Contents' not in exists_result:
-            raise EmoticonException(f'{model.name}에 대한 이미지를 찾을 수 없습니다.')
-
-        file_name = model.image_path.split('/')[-1]
-        file = BytesIO(
-            self.s3.get_object(
-                Bucket=self.s3_bucket,
-                Key=model.image_path,
-            )['Body'].read()
-        )
-
-        return file_name, file
-
     # 새로운 이모티콘 모델을 생성합니다.
     async def create(self, name: str, raw_url: str) -> EmoticonModel:
         prev = await EmoticonModel.find(
@@ -120,12 +42,18 @@ class EmoticonService:
             raise EmoticonException(f'이미 존재하는 이모티콘입니다: {name}')
 
         prim_path = f'images/emoticons/{uuid4()}'
-        path = await self._transfer_file(raw_url, prim_path)
+        path = await transfer_file(
+            http=self.httpx_client,
+            url=raw_url,
+            s3=self.s3,
+            bucket=self.s3_bucket,
+            s3_path=prim_path,
+        )
 
         return await EmoticonModel(
             name=name,
             original_url=raw_url,
-            path=path,
+            image_path=path,
             removed=False,
         ).create()
 
@@ -155,7 +83,7 @@ class EmoticonService:
         return await EmoticonModel(
             name=target,
             original_url=previous.original_url,
-            path=previous.image_path,
+            image_path=previous.image_path,
             removed=False,
         ).create()
 
@@ -186,7 +114,13 @@ class EmoticonService:
             ).to_list()
 
         prim_path = f'images/emoticons/{uuid4()}'
-        path = await self._transfer_file(new_url, prim_path)
+        path = await transfer_file(
+            http=self.httpx_client,
+            url=new_url,
+            s3=self.s3,
+            bucket=self.s3_bucket,
+            s3_path=prim_path,
+        )
 
         await asyncio.gather(
             *map(
