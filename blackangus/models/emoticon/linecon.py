@@ -23,3 +23,5 @@ class LineconModel(Document):
     title: str = Field(required=True, min_length=1)
 
     created_at: datetime = Field(default_factory=datetime.now)
+
+    removed: bool = Field(default=False, required=False)

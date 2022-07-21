@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from io import BytesIO
 from tempfile import TemporaryDirectory
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 from uuid import uuid4
 
 from apnggif import apnggif
@@ -39,10 +39,9 @@ class LineconService:
 
     httpx_client: httpx.AsyncClient
 
-    emoticon_service: EmoticonService
-
     # 기본적으로 사용할 S3, httpx 클라이언트를 셋업합니다.
     def __init__(self, config: EmoticonConfig):
+        self.config = config
         self.s3 = boto3.client(
             's3',
             region_name=config.s3_region,
@@ -96,9 +95,9 @@ class LineconService:
 
             raise EmoticonException(f'API 호출에 실패했습니다: {pretty_printed}')
 
-        counts: int = value.get('result', dict()).get('counts', 0)
+        counts: int = value.get('data', dict()).get('counts', 0)
         items: List[LineconCategoryModel] = []
-        for item in value.get('result', dict()).get('items', []):
+        for item in value.get('data', dict()).get('items', []):
             items.append(
                 LineconCategoryModel(
                     title=item['title'],
@@ -122,7 +121,7 @@ class LineconService:
             raise EmoticonException('설정에 해당 Region의 Endpoint가 없습니다.')
 
         path = f'{endpoint}/api/v1/line/{linecon_id}'
-        response = await self.httpx_client.get(path)
+        response = await self.httpx_client.get(path, timeout=None)
 
         if not response.is_success:
             raise EmoticonException(
@@ -150,12 +149,12 @@ class LineconService:
         if item_id is None:
             raise EmoticonException(f'API 호출에 실패했습니다: {response.text}.')
 
-        title: str = value.get['data']['title']
-        description: str = value.get['data']['description']
-        author: str = value.get['data']['author']
+        title: str = value['data']['title']
+        description: str = value['data']['description']
+        author: str = value['data']['author']
 
         items: List[LineconItemModel] = []
-        for item in value.get['data']['items']:
+        for item in value['data']['items']:
             items.append(
                 LineconItemModel(
                     type=item['type'],
@@ -212,8 +211,8 @@ class LineconService:
                 type(image) is PngImagePlugin.PngImageFile and image.is_animated
             ):
                 animated_png = True
-                exported_origin_path = f'{tmpdir}/{current_id}.png'
-                exported_converted_path = f'{tmpdir}/{current_id}.gif'
+                exported_origin_path = f'{tmpdir.name}/{current_id}.png'
+                exported_converted_path = f'{tmpdir.name}/{current_id}.gif'
 
                 with open(exported_origin_path, 'wb') as file:
                     file.write(content)
@@ -279,9 +278,19 @@ class LineconService:
         ).first_or_none()
 
     @staticmethod
-    async def remove_item_from_server(
-        detail: LineconModel,
+    async def remove_item(
+        name: str,
     ):
+        detail = await LineconModel.find(
+            {
+                'name': name,
+                'removed': False,
+            }
+        ).first_or_none()
+
+        if detail is None:
+            raise EmoticonException(f'{name} 이름의 이모티콘이 없습니다.')
+
         await detail.set(
             {
                 'removed': True,
@@ -296,7 +305,7 @@ class LineconService:
             }
         ).to_list()
 
-        return asyncio.gather(
+        await asyncio.gather(
             *map(
                 lambda result: result.set(
                     {
@@ -307,3 +316,23 @@ class LineconService:
                 results,
             )
         )
+
+    @staticmethod
+    async def get_lists() -> Tuple[List[LineconModel], Dict[str, List[EmoticonModel]]]:
+        linecons: List[LineconModel] = await LineconModel.find(
+            {
+                'removed': False,
+            }
+        ).to_list()
+
+        dictionary: Dict[str, List[EmoticonModel]] = {}
+
+        for linecon in linecons:
+            dictionary[str(linecon.id)] = await EmoticonModel.find(
+                {
+                    'relation_id': linecon.id,
+                    'removed': False,
+                }
+            ).to_list()
+
+        return linecons, dictionary
