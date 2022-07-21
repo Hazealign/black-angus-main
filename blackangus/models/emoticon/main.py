@@ -25,9 +25,9 @@ class EmoticonModel(Document):
 
     original_url: str = Field(required=True)
 
-    image_path: str = Field(equired=True)
+    image_path: str = Field(required=True)
 
-    original_image_path: str = Field(required=False)
+    original_image_path: str = Field(required=False, default=None)
 
     image_from: EmoticonFrom = Field(default_factory=lambda: EmoticonFrom.WEB)
 
