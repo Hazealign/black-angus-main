@@ -1,6 +1,6 @@
 import pathlib
 import sys
-from typing import List
+from typing import List, Dict
 
 import toml
 from pydantic import BaseModel, Field
@@ -44,7 +44,7 @@ class EmoticonConfig(BaseModel):
     s3_access_key: str
     s3_secret_key: str
     s3_region: str
-    api_endpoint: str
+    api_endpoint: Dict[str, str]
 
 
 class Config(BaseModel):

@@ -24,7 +24,7 @@ from blackangus.apps.subscription.periodic import RSSSubscriberApp
 from blackangus.apps.subscription.register import RSSRegisterApp
 from blackangus.config import Config, load
 from blackangus.models.alarm import AlarmModel
-from blackangus.models.emoticon.linecon import LineconModel, LineconCategoryModel
+from blackangus.models.emoticon.linecon import LineconModel
 from blackangus.models.emoticon.main import EmoticonModel
 from blackangus.models.subscribe import RSSDocumentModel, RSSSubscriptionModel
 
@@ -97,7 +97,6 @@ class BotCore:
                 AlarmModel,
                 EmoticonModel,
                 LineconModel,
-                LineconCategoryModel,
             ],
         )
 
