@@ -14,6 +14,7 @@ from blackangus.apps.alarm.register import AlarmCommandApp
 from blackangus.apps.base import BasePeriodicApp, BaseResponseApp
 from blackangus.apps.emoticon.command import EmoticonCommandApp
 from blackangus.apps.emoticon.fetcher import EmoticonFetcherApp
+from blackangus.apps.emoticon.line.command import LineEmoticonCommandApp
 from blackangus.apps.miscs.direction import NaverTransitDirectionApp
 from blackangus.apps.miscs.random import RandomApp
 from blackangus.apps.miscs.translation import TranslationApp
@@ -51,6 +52,7 @@ class BotCore:
             AlarmCommandApp(self.config, self.bot),
             EmoticonFetcherApp(self.config, self.bot),
             EmoticonCommandApp(self.config, self.bot),
+            LineEmoticonCommandApp(self.config, self.bot),
         ]
 
         self.periodic_apps: List[BasePeriodicApp] = [
