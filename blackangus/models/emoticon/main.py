@@ -43,6 +43,8 @@ class EmoticonModel(Document):
 
     updated_at: datetime = Field(default_factory=datetime.now)
 
+    migrated_from_v1: bool = Field(default=False, required=False)
+
 
 class EmoticonListView(BaseModel):
     name: str

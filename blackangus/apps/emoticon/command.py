@@ -51,7 +51,7 @@ class EmoticonCommandApp(PresentedResponseApp):
             return {
                 'help': False,
                 'action': 'create',
-                'keyword': parsed[1],
+                'keyword': parsed[1].upper(),
                 'url': parsed[2],
             }
 
@@ -62,7 +62,7 @@ class EmoticonCommandApp(PresentedResponseApp):
             return {
                 'help': False,
                 'action': 'search',
-                'keyword': parsed[1],
+                'keyword': parsed[1].upper(),
             }
 
         if parsed[0] in ['복제', 'duplicate']:
@@ -72,8 +72,8 @@ class EmoticonCommandApp(PresentedResponseApp):
             return {
                 'help': False,
                 'action': 'duplicate',
-                'keyword': parsed[1],
-                'target': parsed[2],
+                'keyword': parsed[1].upper(),
+                'target': parsed[2].upper(),
             }
 
         if parsed[0] in ['수정', 'edit', 'update']:
@@ -90,12 +90,16 @@ class EmoticonCommandApp(PresentedResponseApp):
                 else 'keyword'
             )
 
+            target = parsed[4] if first_equivalents else parsed[3]
+            if change == 'keyword':
+                target = target.upper()
+
             return {
                 'help': False,
                 'action': 'update',
                 'change': change,
-                'keyword': parsed[3] if first_equivalents else parsed[2],
-                'target': parsed[4] if first_equivalents else parsed[3],
+                'keyword': (parsed[3] if first_equivalents else parsed[2]).upper(),
+                'target': target,
                 'equivalents': first_equivalents or last_equivalents,
             }
 
@@ -109,7 +113,7 @@ class EmoticonCommandApp(PresentedResponseApp):
             return {
                 'help': False,
                 'action': 'delete',
-                'keyword': parsed[2] if first_equivalents else parsed[1],
+                'keyword': (parsed[2] if first_equivalents else parsed[1]).upper(),
                 'equivalents': first_equivalents or last_equivalents,
             }
 
@@ -214,7 +218,7 @@ class EmoticonCommandApp(PresentedResponseApp):
                 )
 
             if action == 'search':
-                name = command['name']
+                name = command['keyword']
 
                 emoticons = await self.emoticon_service.search(name)
                 return None, Embed(
