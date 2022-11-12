@@ -6,8 +6,8 @@ from typing import List
 import discord
 from aiocron import crontab
 from beanie import init_beanie
-from discord.ext import commands
 import motor.motor_asyncio
+from discord.ext import commands
 
 from blackangus.apps.alarm.periodic import AlarmPeriodicApp
 from blackangus.apps.alarm.register import AlarmCommandApp
@@ -38,7 +38,14 @@ class BotCore:
     def __init__(self, config: str):
         self.logger = logging.getLogger('blackangus:core')
         self.config: Config = load(Path(config))
-        self.bot = commands.Bot(command_prefix=self.config.bot.prefix)
+        self.bot = commands.Bot(
+            command_prefix=self.config.bot.emoticon_prefix,
+            intents=discord.Intents(
+                messages=True,
+                guilds=True,
+                guild_messages=True,
+            ),
+        )
 
         self.response_apps: List[BaseResponseApp] = [
             # 여기에 개발한 응답형 커맨드(앱)들을 넣어주세요.
